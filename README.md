@@ -38,4 +38,21 @@ scenario('User signs in successfully', async () => {
 - One test file, two execution contexts
 - Consistent patterns across the team
 
+## Future: Cucumber/Gherkin Integration
+
+We could take this one step further by adopting **Cucumber/Gherkin** syntax via `@badeball/cypress-cucumber-preprocessor`. This would allow non-developers (QA, product) to write or read test scenarios in plain English `.feature` files:
+
+```gherkin
+Feature: Authentication
+
+  Scenario: User signs in successfully
+    Given the user is on the login page
+    When the user authenticates with valid credentials
+    Then the user sees the dashboard
+```
+
+Our DSL would then serve as the step definition layer, still routing to Cypress or RTL under the hood. Worth discussing if we want that level of abstraction.
+
+---
+
 For the full architecture and design decisions, see [the spec document](./SPEC.md).

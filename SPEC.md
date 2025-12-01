@@ -181,6 +181,63 @@ src/
 
 ---
 
+## Future Consideration: Cucumber/Gherkin
+
+We could take this approach one step further by adopting **Cucumber/Gherkin** syntax. Using `@badeball/cypress-cucumber-preprocessor`, tests could be authored in plain English `.feature` files:
+
+```gherkin
+# features/authentication.feature
+Feature: Authentication
+
+  Scenario: User signs in successfully
+    Given the user is on the login page
+    When the user authenticates with valid credentials
+    Then the user sees the dashboard
+
+  Scenario: User sees error with invalid credentials
+    Given the user is on the login page
+    And the API will reject authentication
+    When the user authenticates with invalid credentials
+    Then the user sees an error message "Invalid credentials"
+```
+
+Step definitions would use our DSL under the hood:
+
+```typescript
+// steps/authentication.steps.ts
+import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor';
+import { given, when, then } from '@mytest/dsl';
+
+Given('the user is on the login page', () => {
+  given.user.isOnLoginPage();
+});
+
+When('the user authenticates with valid credentials', async () => {
+  await when.user.authenticates({
+    email: 'valid@example.com',
+    password: 'correctPassword',
+  });
+});
+
+Then('the user sees the dashboard', async () => {
+  await then.user.sees.dashboard();
+});
+```
+
+**Pros**:
+- Non-developers (QA, product) can read/write test scenarios
+- Living documentation that stays in sync with tests
+- Industry-standard BDD format
+
+**Cons**:
+- Extra layer of indirection
+- Maintaining step definitions adds overhead
+- Regex matching can become unwieldy at scale
+
+This is worth discussing if we want to involve non-developers in test authoring, or if the TypeScript DSL is sufficient.
+
+---
+
 ## Open Questions for Team Discussion
 
 1. **Granularity**: Should `authenticates` be a single atomic action, or composed of smaller actions (`fillsEmail`, `fillsPassword`, `submitsLoginForm`)?
